@@ -14,6 +14,7 @@ const Ctg = () => {
             try {
                 const response = await axios.get(`https://infogujarat.in/api/news_details/1/80`);
                 setTitle(response.data.data.title)
+                setImage(response.data.data.blog_image[0].details)
             } catch (err) {
                 console.log(err)
             }
@@ -28,12 +29,12 @@ const Ctg = () => {
                 <title>{title}</title>
                 <meta name="description" content={desc} />
                 <meta property="og:image" content={image} />
-                <meta name="image" content={image} />
+                <meta name="image" content={`https://img.youtube.com/vi/${image}/hqdefault.jpg`} />
             </Helmet>
 
             <h1>{title}</h1>
             <p>{desc}</p>
-            <img src={image} alt="" />
+            <img src={`https://img.youtube.com/vi/${image}/hqdefault.jpg`} alt="" className=''/>
         </div>
     )
 }
