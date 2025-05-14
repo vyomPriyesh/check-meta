@@ -1,20 +1,39 @@
 const express = require('express');
-const { render } = require('./dist/server/entry-server.js');
 const fs = require('fs');
 const path = require('path');
 
-const isProd = process.env.NODE_ENV === 'production';
 const app = express();
+const isProd = process.env.NODE_ENV === 'production';
+const resolve = (p) => path.resolve(__dirname, p);
 
-app.use('/assets', express.static(path.resolve(__dirname, 'dist/client/assets')));
+if (isProd) {
+  const indexTemplate = fs.readFileSync(resolve('dist/index.html'), 'utf-8');
+  const { render } = require('./dist/server/entry-server.js');
 
-app.get('*', async (req, res) => {
-  const template = fs.readFileSync(path.resolve(__dirname, 'dist/client/index.html'), 'utf-8');
-  const appHtml = render(req.url); // call your SSR render function
+  // Serve static assets
+  app.use('/assets', express.static(resolve('dist/assets')));
+  app.use('/vite.svg', express.static(resolve('dist/vite.svg')));
 
-  const html = template.replace(`<!--ssr-outlet-->`, appHtml.html);
+  app.use('*', async (req, res) => {
+    try {
+      const { html: appHtml, head } = await render(req.originalUrl);
 
-  res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+      // Inject into template
+      const html = indexTemplate
+        .replace('<!--app-->', appHtml)
+        .replace('<!--head-->', head);
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+    } catch (err) {
+      console.error(err);
+      res.status(500).end('Internal Server Error');
+    }
+  });
+} else {
+  res.status(500).send('Start dev server with `npm run dev`.');
+}
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
-
-module.exports = app;
