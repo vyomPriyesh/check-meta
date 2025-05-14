@@ -1,19 +1,13 @@
-import { StrictMode } from 'react'
 import { renderToString } from 'react-dom/server'
 import App from './App'
-// import { StaticRouter } from 'react-router/server'
+import { StaticRouter } from 'react-router-dom/server'
 import { Helmet } from 'react-helmet'
 
-/**
- * @param {string} _url
- */
-export function render(_url) {
+export function render(url) {
   const appHtml = renderToString(
-    <StrictMode>
-      {/* <StaticRouter location={_url}> */}
-        <App />
-      {/* </StaticRouter> */}
-    </StrictMode>
+    <StaticRouter location={url}>
+      <App />
+    </StaticRouter>
   )
 
   const helmet = Helmet.renderStatic()

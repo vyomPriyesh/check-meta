@@ -1,6 +1,7 @@
 import './App.css'
 import { useEffect, useState } from 'react'
 import Ctg from './Ctg'
+import { Route, Routes } from 'react-router-dom'
 
 function App() {
 
@@ -8,10 +9,10 @@ function App() {
 
   return (
     <>
-      <Ctg />
-      {/* <Routes>
-        <Route path='/' element={<Ctg />} />
-      </Routes> */}
+      {/* <Ctg /> */}
+      <Routes>
+        <Route path='/:id' element={<Ctg />} />
+      </Routes>
     </>
   )
 }
